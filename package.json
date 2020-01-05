@@ -19,7 +19,8 @@
   "dependencies": {
     "console.table": "^0.10.0",
     "ctable": "0.0.3",
-    "inquirer": "^7.0.1",
+    "inquirer": "^7.0.2",
+    "keypress": "^0.2.1",
     "mysql": "^2.17.1"
   }
 }

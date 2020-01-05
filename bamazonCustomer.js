@@ -5,81 +5,85 @@ ctable = require("console.table")
 // 
 var connection = mysql.createConnection({
     host: "localhost",
-
-    // Your port; if not 3306
     port: 3306,
-
-    // Your username
     user: "root",
-
-    // Your password
     password: "root",
     database: "bamazon_db"
 });
-// 
+// connection point
 connection.connect(function (err) {
     if (err) throw err;
     console.log("connected id ", connection.threadId);
-    readInventory()
-    itemSearch();
+    afterCon();
 });
 // 
-function readInventory() {
-    connection.query("SELECT * FROM bamazon_db.products", function (err, res) {
-        if (err) throw err;
-        console.table(res);
-    });
-};
+function afterCon() {
+    departments = [];
+    department = "";
+    inquirer.prompt({
+            type: "list",
+            message: "welcome to Bamazon!!" + "\n",
+            choices: ["Shop", "Exit"],
+            name: "run"
+        })
+        .then(function (answer) {
+            switch (answer.run) {
+                case ("Shop"):
+                    itemSearch();
+                    break;
+                case ("Exit"):
+                    connection.end();
+                    break;
+            }
+        });
+}
 // 
 function itemSearch() {
-    inquirer.prompt([{
-            name: "item",
-            type: "input",
-            message: "Enter the Id Num of the item would you like." + "\n"
-        },
-        {
-            name: "amount",
-            type: "input",
-            message: "Enter the amount of the item would you like." + "\n"
-        }])
-        .then(function (answer) {
-            connection.query("SELECT * FROM products WHERE ?",
-                [{
-                    item_id: answer.item
-                }],
-                function (err, res1) {
-
-                        connection.query("Update products SET stock_quantity = stock_quantity - ? WHERE ?",
-                            [
-                                parseInt(answer.amount),
-                                {
-                                    item_id: answer.item
-                                }
-                            ],
-                            function (err, res) {
-                                console.log("hello world!!")
-                                if (err) throw err;
-                                if (res1[0].stock_quantity > 1) {
-                                    console.log(res1[0].stock_quantity + "purchase completed")
-                                } else {
-                                    console.log(res1[0].stock_quantity + "purchase incomplete")
-                                }
-                                if (err) throw err;
-                            })
-
-                })
-        })
-}
-
-//                 console.log(
-//                     "id: " +
-//                     res[0].item_id +
-//                     " || name: " +
-//                     res[0].product_name +
-//                     " || dept: " +
-//                     res[0].department_name +
-//                     " || price: " +
-//                     res[0].price +
-//                     " || amount: " +
-//                     res[0].stock_quantity
-// 
+    connection.query("SELECT * FROM products" +
+        department,
+        function (err, res) {
+            if (err) throw err;
+            console.table(res);
+            inquirer.prompt([{
+                        name: "item",
+                        type: "input",
+                        message: "Enter the Id Num of the item would you like." + "\n"
+                    },
+                    {
+                        name: "amount",
+                        type: "input",
+                        message: "Enter the amount of the item would you like." + "\n"
+                    },
+                ])
+                // select the product the user choose by item_id *currently not functioning*
+                .then(function (answer) {
+                    connection.query("SELECT * FROM products WHERE ?", [{
+                        item_id: answer.item
+                    }], function (err, res1) {
+                        if (res1[0].stock_quantity > answer.amount) {
+                            connection.query("UPDATE products SET stock_quantity = stock_quantity - ? WHERE ?",
+                                [
+                                    parseInt(answer.amount),
+                                    {
+                                        item_id: answer.item
+                                    }
+                                ],
+                                function (err, res2) {
+                                    if (err) throw err;
+                                    if (answer.amount > 1) {
+                                        console.log(answer.amount + " unit of " + res1[0].item_id + " has been purchased for $" + (answer.amount * res1[0].price) + " !");
+                                    } else {
+                                        console.log(answer.amount + " units of " + res1[0].item_id + " have been purchased for $" + (answer.amount * res1[0].price) + " !");
+                                    }
+                                    afterCon();
+                                });
+                        } else {
+                            console.log("insufficient quantity!");
+                            afterCon();
+                        }
+                        if (err) throw err;
+                    });
+                });
+        });
+};
+//
