@@ -7,11 +7,11 @@ step 1: choose whether you would like shop or exit
 
 if 'shop': choose the item_id of the merchendise you would like to purchase, 
 
-![start](./cap3.png)
+![body](./cap3.png)
 
 entering item_id num will prompt user to enter quantity desired
 
-![start](./cap4.png)
+![end](./cap4.png)
 
 entering quantity will complete purchase if in stock
 
