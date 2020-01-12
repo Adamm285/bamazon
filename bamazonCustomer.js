@@ -20,20 +20,21 @@ connection.connect(function (err) {
 function afterCon() {
     departments = [];
     department = "";
-    inquirer.prompt({
-            type: "list",
+    inquirer.prompt([{
+            type: "confirm",
             message: "welcome to Bamazon!!" + "\n",
-            choices: ["Shop", "Exit"],
-            name: "run"
-        })
+            name: "run1"
+        },{
+            type: "list",
+            message: "would you like to shop" + "\n",
+            name: "run",
+            choices:["Shop", "Exit"]
+        }])
         .then(function (answer) {
-            switch (answer.run) {
-                case ("Shop"):
-                    itemSearch();
-                    break;
-                case ("Exit"):
-                    connection.end();
-                    break;
+            if (answer.run == "Shop") {
+                itemSearch();
+            } else {    
+                connection.end();
             }
         });
 }
@@ -53,7 +54,7 @@ function itemSearch() {
                         name: "amount",
                         type: "input",
                         message: "Enter the amount of the item would you like." + "\n"
-                    },
+                    }
                 ])
                 // select the product the user choose by item_id *currently not functioning*
                 .then(function (answer) {
