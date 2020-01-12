@@ -22,7 +22,7 @@ function afterCon() {
     department = "";
     inquirer.prompt([{
             type: "confirm",
-            message: "welcome to Bamazon!!" + "\n",
+            message: "Welcome to Bamazon!!" + "\n",
             name: "run1"
         },{
             type: "list",
